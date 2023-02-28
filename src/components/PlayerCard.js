@@ -3,12 +3,16 @@ import axios from "axios";
 
 function PlayerCard() {
   const [player, setPlayer] = useState([]);
+  const [playerRole, setPlayerRole] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get("/api/bootstrap-static/");
         setPlayer(response.data.elements);
+        setPlayerRole(response.data.element_types);
+        console.log(response.data.elements);
+        console.log(response.data.element_types);
       } catch (error) {
         console.log(error);
       }
@@ -16,15 +20,33 @@ function PlayerCard() {
     fetchData();
   }, []);
 
+  const playerId = playerRole.map((role) => {
+    return <div>{role.id}</div>;
+  });
+
+  const playerRoles = playerRole.map((role) => {
+    return <div>{role.plural_name_short}</div>;
+  });
+
   return (
-    <div className="container mx-auto mt-20 grid grid-cols-4 gap-4">
-      {player.map((item) => {
-        console.log(item);
+    <div className="container flex items-center justify-center flex-wrap mx-auto gap-4">
+      {player.map((item, index) => {
         return (
-          <div className="flex flex-col bg-secondary-color p-5 items-start justify-start rounded-md text-white">
-            <span>{`${item.first_name} ${item.second_name}`}</span>
-            <span>{`Goal: ${item.goals_scored}`}</span>
-            <span>{`Assist: ${item.assists}`}</span>
+          <div className="card w-96 bg-base-100 shadow-xl">
+            <div className="card-body">
+              <h2 className="card-title">
+                {`${item.first_name} ${item.second_name}`}
+                <div className="badge badge-secondary">
+                  {item.element_types === playerId ? playerRoles : "Null"}
+                </div>
+              </h2>
+              <p>Team</p>
+              <div className="card-actions justify-end">
+                <div className="badge badge-outline">{`Goal: ${item.goals_scored}`}</div>
+                <div className="badge badge-outline">{`Assist: ${item.assists}`}</div>
+                <div className="badge badge-outline">{`Total Points: ${item.total_points}`}</div>
+              </div>
+            </div>
           </div>
         );
       })}
